@@ -43,7 +43,7 @@ app.use((req, res, next) => {
     next();
 });
 
-const port = 3000;
+const port = 1000;
 
 const options = {
     key: fs.readFileSync('server.key'),
