@@ -94,7 +94,7 @@ function App() {
   )
   // uso server
   useEffect(() => { // recupera i dati all'avvio
-    fetch("https://localhost:3000/directory?id=react&b=val2", 
+    fetch(/*"https://localhost:3000*/"/directory?id=react&b=val2", 
       {mode: 'cors', headers: { 'Content-Type': 'application/json',}})
     .then(response => {
       if(!response.ok){
