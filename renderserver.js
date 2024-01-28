@@ -161,6 +161,7 @@ app.delete('/delete', async (req, res) => {
 });
 
 app.get('/server', (req, res) => {
+    console.log('Server from', __dirname + '/')
     res.sendFile('server.html',{root: __dirname +'/'})
 })
 
