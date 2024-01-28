@@ -1,0 +1,254 @@
+<!doctype html>
+<!--  https://www.maps.ie/coordinates.html -->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>GAT A.R.</title>
+        <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+        <script src="https://github.com/supermedium/superframe/blob/master/components/look-at/dist/aframe-look-at-component.min.js"></script>
+        
+        <!-- Pure three.js code that the A-Frame components use for location-based AR -->
+        <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex-location-only.js'></script>
+
+        <!-- AR.js A-Frame components -->
+        <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js'></script>
+        <style>
+            .arjs-loader {
+              height: 100%;
+              width: 100%;
+              position: absolute;
+              top: 0;
+              left: 0;
+              z-index: 9999;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            .arjs-loader div {
+              text-align: center;
+              font-size: 1.25em;
+              color: black;
+              background-color: #999;
+            }
+        </style>
+    </head>
+    <script>
+        let oldData = []; // contiene gli elementi già presenti in DOM
+        //let newData = []; // contiene gli elementi scaricati dal server
+        let unicID; // identificativo unico del dispositivo
+        let blink = true; // flag per il lampeggio di #text-camera
+        //let count = 1;
+        //let timer;
+        let unicURL; // indirizzo server
+        //let downloaded = false;
+        let intervallo = false; // flag per avviare i setInterval delle distanze
+                
+        function mapElement(el, data) {
+            data.map(item =>{
+                if(item.type != "model"  ){
+                    console.log('item location:', item._id, item.text, )
+                    /*const compoundEntity = document.createElement("a-entity");
+                    compoundEntity.setAttribute('gps-new-entity-place', {
+                        latitude: item.lat,
+                        longitude: item.lon
+                    });*/
+                    
+                    const img = document.createElement("a-image");
+                    img.setAttribute("id", 'img'+item._id);
+                    img.setAttribute('gps-new-entity-place', {
+                        latitude: item.lat,
+                        longitude: item.lon
+                    });
+                    img.setAttribute("src", item.imgURL);
+                    
+                    img.setAttribute("look-at", el);
+                    img.object3D.scale.set(5, 3, 3);
+                    img.object3D.position.set(0, 3, 0);
+                    //img.setAttribute('remove','true')
+
+                    const text = document.createElement("a-text");
+                    text.setAttribute("id", 'text'+item._id);
+                    text.setAttribute('gps-new-entity-place', {
+                        latitude: item.lat,
+                        longitude: item.lon
+                    });                    
+                    text.setAttribute("look-at", "[gps-new-camera]");
+                    text.setAttribute("align", "center");
+                    text.setAttribute("value", item.text);
+                    text.setAttribute("name", item.text);
+                    text.object3D.scale.set(7, 7, 7);
+                    //text.setAttribute('remove','true')
+                    //text.setAttribute("scale", "10 10 10");
+                    //compoundEntity.appendChild(img);
+                    //compoundEntity.appendChild(text);
+                    //document.querySelector("a-scene").appendChild(compoundEntity);
+                    document.querySelector("a-scene").appendChild(img);
+                    document.querySelector("a-scene").appendChild(text);
+
+                    /*const distanza = item.text + compoundEntity['gps-new-entity-place'].distance;
+                    text.setAttribute("value", distanza);*/                                
+                }
+            }); // data.map
+        }
+/*
+        function removeElement(){
+            const allElements = document.querySelector('a-scene').getChildren();
+            const element = allElements.filter(i => i.getAttribute('remove'));
+            element.map(child => child.remove());
+        }
+*/        
+        function returnDistance(location){// funzione 
+            let text = location.getAttribute('name') + " ";
+            let distance = location.components['gps-new-entity-place'].distance;
+            distance = distance ? Math.round(distance) + " meters" : " --- ";
+            return text + distance;
+        }
+        
+        function confrontaElementi (obj1, obj2){ // confronto gli elementi 
+            //console.log(obj1,obj2)
+            const keys1 = Object.keys(obj1);
+
+            for (let key of keys1){
+                if (obj1[key] !== obj2[key]) return false;
+            }
+            return true;
+        }
+        function rimuoviElemento(id, index){
+            const padre = document.querySelector('a-scene');
+            const x_text = document.getElementById('text'+id); // individuo nel dom l'elemento text                           
+            const x_img = document.getElementById('img'+id); // individuo nel dom l'elemento img   
+            let a = padre.removeChild(x_text); // rimuovo dal dom l'elemento text 
+            let b = padre.removeChild(x_img); // lo rimuovo dal dom l'elemento img
+            oldData.splice(index, 1); // lo cancello da oldData
+            console.log("elemento rimosso dal DOM", a, b )
+        }
+
+        function queryInterval(el, off_line){           
+            fetch(uniqueURL, {mode: 'cors', headers: { 'Content-Type': 'application/json',}})
+            .then(response => {
+                if(!response.ok){
+                    console.log("Error: promise reject");
+                    throw Error(response.statusText)
+                    //return Promise.reject(response);
+                }
+                return response.json();
+            }).then(data => {
+                if(!intervallo) { // se all'avvio
+                    const x = setInterval(() => {                        
+                        let a = document.querySelector('a-scene').getChildren()
+                        let b = a.filter(item => item.nodeName == "A-TEXT")
+                            .map(i => {                                          
+                                i.setAttribute('value',returnDistance( i )); 
+                            } // ~ map
+                        ); // ~ filter
+                    }, 500); 
+                    intervallo = true;
+                    console.log('Popolo il DOM....\nSettato setInterval distanze\nChiamo mapElement..');
+                    mapElement(el, data); // popola con i dati dal server 
+                    oldData = data; // setto per la prima volta oldData                            
+                }  else { // se invece non è avvio, fai i controlli su array
+                    console.log("verifico se ci sono variazioni...")
+                    let newData = data;
+                    oldData.map((oldItem, indexOldData) =>{
+                        let itemIndex = newData.findIndex(newItem => newItem._id == oldItem._id); // vedo se è già presente 
+                        if (itemIndex != -1) { // se l'oggetto viene trovato
+                            if (confrontaElementi(oldItem, newData[itemIndex])) {
+                                let a = newData.splice(itemIndex, 1); // lo cancella da newData
+                                console.log("tolto da new data perchè già presente e invariato: ", a);
+                            } else {console.log('oggetto variato', newData[itemIndex])
+                                rimuoviElemento(oldItem._id, indexOldData);
+                            }
+                        } else { // se l'oggetto non viene trovato lo elimino
+                            /*const padre = document.querySelector('a-scene');
+                            const x_text = document.getElementById('text'+oldItem._id); // individuo nel dom l'elemento text                           
+                            const x_img = document.getElementById('img'+oldItem._id); // individuo nel dom l'elemento img   
+                            let a = padre.removeChild(x_text); // rimuovo dal dom l'elemento text 
+                            let b = padre.removeChild(x_img); // lo rimuovo dal dom l'elemento img
+                            oldData.splice(indexOldData, 1); // lo cancello da oldData
+                            console.log("elemento rimosso dal DOM", a, b )
+                            */
+                            rimuoviElemento(oldItem._id, indexOldData);
+                        } // ~ if else
+                    });
+                    if (newData.length > 0) { // se ci sono nuovi elementi
+                        mapElement(el, newData); // inseriscili nel DOM
+                        console.log("inseriti nuovi elementi: ", newData)
+                        oldData.push(...newData); // e li inserisci in coda ad oldData
+                    } else {
+                        console.log("nessun nuovo elemento");
+                    } // ~ if else
+                }
+                document.getElementById('text-camera').setAttribute("value","Server");
+            }).catch(err => {
+                console.log('Fetch problem: ' + err.message);
+                document.getElementById('text-camera').setAttribute("value","Server error");
+            }); // fetch                     
+        } // set queryInterval           
+        
+        window.onload = () => {
+            const off_line = document.getElementById('text-camera');
+            const loader   = document.getElementById('loader');
+            const lon_text = document.getElementById('lon-text');
+            const lat_text = document.getElementById('lat-text');
+            if (localStorage.getItem('RandomID') === null ){
+                unicID = "ID-" + Date.now() + "-" + Math.round(Math.random() * 1000);
+                localStorage.setItem('RandomID', unicID);
+                console.log('first time, randomID set  =>', unicID);
+            } else {
+                unicID = localStorage.getItem('RandomID');
+                console.log('Wellcome  =>', unicID);
+            }
+            //unicID = "ID-" + Date.now() + "-" + Math.round(Math.random() * 1000);
+            //console.log('=>', unicID);
+            document.getElementById('unicID-text').setAttribute('value', unicID);         
+            uniqueURL = `/directory?id=${unicID}&b=val2`;
+            
+            let blinkig = setInterval(() => {
+                blink ? off_line.setAttribute("opacity", 0): off_line.setAttribute("opacity", 1);
+                blink=!blink;                        
+            }, 1000);            
+
+            const el = document.getElementById('camera');
+
+            el.addEventListener("gps-camera-update-position", async(e) =>{
+                lon_text.setAttribute("value", "lon: " + e.detail.position.longitude);
+                lat_text.setAttribute("value", "lat: " + e.detail.position.latitude);                 
+            });
+          
+            queryInterval(el, off_line);
+            const y = setInterval( queryInterval, 10000 ); 
+            loader.setAttribute("style", "display: none;");                  
+           
+        }; // windows.load	        
+    </script>   
+    <body style="margin: 0px; overflow: hidden;">
+        <div class="arjs-loader" id="loader">
+            <div>Loading data, please wait...</div>
+        </div>
+        <!-- con vr-mode-ui="enabled: false" abilita la funzione VR sul display -->
+        <!-- videoTexure: true non abilita la cam -->
+        <a-scene 
+            vr-mode-ui = "enabled: false"            
+            loading-screen = "enabled: false;"
+            arjs="sourceType: webcam; debugUIEnabled: false; ">
+                
+            <a-camera id = "camera" 
+                gps-new-camera = 'gpsMinDistance: 5'
+                rotation-reader>                
+                <a-text
+                    font = "https://cdn.aframe.io/fonts/Exo2Bold.fnt"
+                    position="-0.2 -0.3 -1"
+                    value="Server!"
+                    opacity=1
+                    width="2"
+                    color="red"
+                    id="text-camera"
+                ></a-text>
+                <a-text id="lat-text" value="lat: ---" width="1" color="#00ff00" position="-0.45 -0.13 -1"></a-text>
+                <a-text id="lon-text" value="lon: ---" width="1" color="#00ff00" position="-0.45 -0.17 -1"></a-text> 
+                <a-text id="unicID-text" value="" width="1" color="magenta" position="-0.45 -0.21 -1"></a-text>               
+            </a-camera>
+        </a-scene>
+    </body>
+</html>
