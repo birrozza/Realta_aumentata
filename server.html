@@ -62,7 +62,7 @@
                     });
                     img.setAttribute("src", item.imgURL);
                     
-                    img.setAttribute("look-at", el);
+                    img.setAttribute("look-at", "#camera");
                     img.object3D.scale.set(5, 3, 3);
                     img.object3D.position.set(0, 3, 0);
                     //img.setAttribute('remove','true')
@@ -73,7 +73,7 @@
                         latitude: item.lat,
                         longitude: item.lon
                     });                    
-                    text.setAttribute("look-at", "[gps-new-camera]");
+                    text.setAttribute("look-at", "#camera");
                     text.setAttribute("align", "center");
                     text.setAttribute("value", item.text);
                     text.setAttribute("name", item.text);
