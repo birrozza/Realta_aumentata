@@ -55,6 +55,17 @@
                     });
                     compoundEntity.setAttribute("look-at", "#camera");
                     compoundEntity.setAttribute("id", item._id);*/
+                    const sfondo = document.createElement("a-plane");
+                    sfondo.setAttribute("id", 'sfondo'+item._id);
+                    sfondo.setAttribute('color', "#FFF");
+                    sfondo.object3D.scale.set(5, 1.5, 0);
+                    sfondo.setAttribute('opacity', '0.5');
+                    sfondo.setAttribute("look-at", "#camera");
+                    sfondo.setAttribute('gps-new-entity-place', {
+                        latitude: item.lat,
+                        longitude: item.lon
+                    });
+                    sfondo.object3D.position.set(0, 0, -10);                    
 
                     const img = document.createElement("a-image");
                     img.setAttribute("id", 'img'+item._id);
@@ -62,12 +73,11 @@
                         latitude: item.lat,
                         longitude: item.lon
                     });
-                    img.setAttribute("src", item.imgURL);
-                    
+                    img.setAttribute("src", item.imgURL);                    
                     img.setAttribute("look-at", "#camera");
                     img.object3D.scale.set(5, 3, 3);
-                    img.object3D.position.set(0, 3, 0);
-                    //img.setAttribute('remove','true')
+                    img.object3D.position.set(0, 2.5, 0);
+                    img.setAttribute('opacity','0.8')
 
                     const text = document.createElement("a-text");
                     text.setAttribute("id", 'text'+item._id);
@@ -79,15 +89,19 @@
                     text.setAttribute("align", "center");
                     text.setAttribute("value", item.text);
                     text.setAttribute("name", item.text);
-                    text.setAttribute("background", "color: blue")
                     text.object3D.scale.set(5, 5, 5);
+                    text.setAttribute('opacity', '0.8')
+                    
                     //text.setAttribute('remove','true')
                     //text.setAttribute("scale", "10 10 10");
                     /*compoundEntity.appendChild(img);
                     compoundEntity.appendChild(text);
                     document.querySelector("a-scene").appendChild(compoundEntity);*/
-                    document.querySelector("a-scene").appendChild(img);
+                    sfondo.setAttribute('width', text.getAttribute('value').length*0.2)
+                        
+                    document.querySelector("a-scene").appendChild(img);                    
                     document.querySelector("a-scene").appendChild(text);
+                    document.querySelector("a-scene").appendChild(sfondo);
 
                     /*const distanza = item.text + compoundEntity['gps-new-entity-place'].distance;
                     text.setAttribute("value", distanza);*/                                
@@ -120,9 +134,11 @@
         function rimuoviElemento(id, index){
             const padre = document.querySelector('a-scene');
             const x_text = document.getElementById('text'+id); // individuo nel dom l'elemento text                           
-            const x_img = document.getElementById('img'+id); // individuo nel dom l'elemento img   
+            const x_img = document.getElementById('img'+id); // individuo nel dom l'elemento img 
+            const x_sfondo = document.getElementById('sfondo'+id); // individuo nel dom l'elemento img   
             let a = padre.removeChild(x_text); // rimuovo dal dom l'elemento text 
             let b = padre.removeChild(x_img); // lo rimuovo dal dom l'elemento img
+            let c = padre.removeChild(x_sfondo); // lo rimuovo dal dom l'elemento img
             oldData.splice(index, 1); // lo cancello da oldData
             console.log("elemento rimosso dal DOM", a, b )
         }
@@ -138,6 +154,7 @@
                 return response.json();
             }).then(data => {
                 if(!intervallo) { // se all'avvio
+                    loader.setAttribute("style", "display: none;"); 
                     const x = setInterval(() => {                        
                         let a = document.querySelector('a-scene').getChildren()
                         let b = a.filter(item => item.nodeName == "A-TEXT")
@@ -188,7 +205,33 @@
                 document.getElementById('text-camera').setAttribute("value","Server error");
             }); // fetch                     
         } // set queryInterval           
-        
+        /*
+        AFRAME.registerComponent('testo-con-sfondo', {
+            schema: {
+                coloreTesto: {default: '#000'},
+                coloreSfondo: {default: '#FFF'},
+                valore: {default: ''}
+            },
+            init: function () {
+                // Crea l'entità di sfondo
+                var sfondo = document.createElement('a-plane');
+                sfondo.setAttribute('color', this.data.coloreSfondo);
+                sfondo.setAttribute('height', '0.05');
+                sfondo.setAttribute('width', '0.3');
+                sfondo.setAttribute('opacity', '0.5');
+                this.el.appendChild(sfondo);
+
+                // Crea l'entità di testo
+                var testo = document.createElement('a-text');
+                testo.setAttribute('value', this.data.valore);
+                testo.setAttribute('color', this.data.coloreTesto);
+                testo.setAttribute('align', 'center');
+                testo.setAttribute('width', 1);
+                testo.setAttribute('opacity', '0.4')
+                this.el.appendChild(testo);
+            }
+        });*/
+
         window.onload = () => {
             const off_line = document.getElementById('text-camera');
             const loader   = document.getElementById('loader');
@@ -221,7 +264,7 @@
           
             queryInterval(el, off_line);
             const y = setInterval( queryInterval, 10000 ); 
-            loader.setAttribute("style", "display: none;");                  
+            //loader.setAttribute("style", "display: none;");                  
            
         }; // windows.load	        
     </script>   
@@ -248,9 +291,11 @@
                     color="red"
                     id="text-camera"
                 ></a-text>
+                <a-plane position="-0.21 -0.17 -1" opacity="0.5" width=".5" height=".14" color="#000"></a-plane>
                 <a-text id="lat-text" value="lat: ---" width="1" color="#00ff00" position="-0.45 -0.13 -1"></a-text>
                 <a-text id="lon-text" value="lon: ---" width="1" color="#00ff00" position="-0.45 -0.17 -1"></a-text> 
-                <a-text id="unicID-text" value="" width="1" color="magenta" position="-0.45 -0.21 -1" background="color: red"></a-text>               
+                <a-text id="unicID-text" value="" width="1" color="magenta" position="-0.45 -0.21 -1" ></a-text>               
+                <!--<a-entity position="-0.20 -0.25 -1" testo-con-sfondo="valore: Ciao Mondo"></a-entity>-->
             </a-camera>
         </a-scene>
     </body>
