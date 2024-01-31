@@ -6,8 +6,8 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <title>GAT A.R.</title>
         <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-        <script src="https://github.com/supermedium/superframe/blob/master/components/look-at/dist/aframe-look-at-component.min.js"></script>
-        
+        <!--<script src="https://github.com/supermedium/superframe/blob/master/components/look-at/dist/aframe-look-at-component.min.js"></script>-->
+        <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
         <!-- Pure three.js code that the A-Frame components use for location-based AR -->
         <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex-location-only.js'></script>
 
@@ -52,8 +52,10 @@
                     compoundEntity.setAttribute('gps-new-entity-place', {
                         latitude: item.lat,
                         longitude: item.lon
-                    });*/
-                    
+                    });
+                    compoundEntity.setAttribute("look-at", "#camera");
+                    compoundEntity.setAttribute("id", item._id);*/
+
                     const img = document.createElement("a-image");
                     img.setAttribute("id", 'img'+item._id);
                     img.setAttribute('gps-new-entity-place', {
@@ -77,12 +79,13 @@
                     text.setAttribute("align", "center");
                     text.setAttribute("value", item.text);
                     text.setAttribute("name", item.text);
-                    text.object3D.scale.set(7, 7, 7);
+                    text.setAttribute("background", "color: blue")
+                    text.object3D.scale.set(5, 5, 5);
                     //text.setAttribute('remove','true')
                     //text.setAttribute("scale", "10 10 10");
-                    //compoundEntity.appendChild(img);
-                    //compoundEntity.appendChild(text);
-                    //document.querySelector("a-scene").appendChild(compoundEntity);
+                    /*compoundEntity.appendChild(img);
+                    compoundEntity.appendChild(text);
+                    document.querySelector("a-scene").appendChild(compoundEntity);*/
                     document.querySelector("a-scene").appendChild(img);
                     document.querySelector("a-scene").appendChild(text);
 
@@ -247,7 +250,7 @@
                 ></a-text>
                 <a-text id="lat-text" value="lat: ---" width="1" color="#00ff00" position="-0.45 -0.13 -1"></a-text>
                 <a-text id="lon-text" value="lon: ---" width="1" color="#00ff00" position="-0.45 -0.17 -1"></a-text> 
-                <a-text id="unicID-text" value="" width="1" color="magenta" position="-0.45 -0.21 -1"></a-text>               
+                <a-text id="unicID-text" value="" width="1" color="magenta" position="-0.45 -0.21 -1" background="color: red"></a-text>               
             </a-camera>
         </a-scene>
     </body>
