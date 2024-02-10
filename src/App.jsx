@@ -2,10 +2,10 @@
 // npm run client
 import { useEffect, useState } from 'react'
 import './App.css'
-import LeafletMap from './components/LeafletMap';
+//import LeafletMap from './components/LeafletMap';
 //import Elenco from './components/Elenco';
 import Test from './components/Test';
-import SheetComponent from './components/SheetComponent';
+//import SheetComponent from './components/AntPath';
 //import { set } from 'mongoose';
 //import axios from "axios";
 //import mongoose from "mongoose";
@@ -22,8 +22,8 @@ function App() {
     console.log('in app => elemento da cancellare', poiDaCancellare)
     const idPoiDaCancellare = poiDaCancellare._id;     
         
-    //const url = `https://localhost:3000/delete?id=${idPoiDaCancellare}`
-    const url = `/delete?id=${idPoiDaCancellare}`
+    const url = `https://localhost:3000/delete?id=${idPoiDaCancellare}`
+    //const url = `/delete?id=${idPoiDaCancellare}`
     fetch(url , 
         {
           method: 'DELETE', 
@@ -54,7 +54,8 @@ function App() {
     if (nuoviPoi.length < 1) return;
     console.log('in app aggiornare', nuoviPoi)
     const oldID = nuoviPoi._id; // prendo id provvisorio del nuovo poi
-    fetch(/*'https://localhost:3000*/'/addpoi', // effettuo chiamata
+    //fetch(/*'https://localhost:3000*/'/addpoi', // effettuo chiamata
+    fetch('https://localhost:3000/addpoi', // effettuo chiamata
         {
           method: 'POST', 
           body: JSON.stringify(nuoviPoi),
@@ -94,7 +95,8 @@ function App() {
   )
   // uso server
   useEffect(() => { // recupera i dati all'avvio
-    fetch(/*"https://localhost:3000*/"/directory?id=react&b=val2", 
+    //fetch(/*"https://localhost:3000*/"/directory?id=react&b=val2", 
+    fetch("https://localhost:3000/directory?id=mappa&b=val2", 
       {mode: 'cors', headers: { 'Content-Type': 'application/json',}})
     .then(response => {
       if(!response.ok){

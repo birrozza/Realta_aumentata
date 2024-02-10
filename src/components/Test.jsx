@@ -2,12 +2,17 @@
  *  l'inserimento di un nuovo POI
  *  viene gestito dal componente
  *  NewMarker ed è col tasto dx 
+ *  https://rubenspgcavalcante.github.io/leaflet-ant-path/
+ *  https://gitlab.com/manuel.richter95/leaflet.notifications
  ********************************/
 
-import { Renderer, marker } from 'leaflet';
+//import { Renderer, marker } from 'leaflet';
 import React, { useState, useRef, useEffect } from 'react';
-import { TileLayer, MapContainer, Marker, Popup } from 'react-leaflet';
-import { useMap, useMapEvent } from 'react-leaflet/hooks'
+import { TileLayer, MapContainer, Marker, Popup, Tooltip } from 'react-leaflet';
+//import { useMap, useMapEvent } from 'react-leaflet/hooks';
+import AntPath from './AntPath';
+import NewMarker from './NewMarker';
+import 'leaflet/dist/leaflet.css';
 
 let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
   //const [markers, setMarkers] = useState(poi); 
@@ -18,14 +23,13 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
   const markerRefs = useRef([]); // la lista di tutti gli elementi <Marker>
   const mapRef = useRef(); // riferimento alla mappa
   const inputRefs= useRef([]) // lista si tutti i tetxt <input> 
-  
+
   console.log('------------------------------------------------') 
   console.log('oldPOI',oldPOI)
   console.log('newPOI', newPOI)
   console.log('markers', markers)
   
-  //useEffect(() => { setOldPOI(markers) }, [markers]);
-  
+
   const handlePoiClick = (x) => { // evidenzia l'input-text del marker selezionato
     //console.log('in handlePoiClick', inputRefs.current)    
     inputRefs['current'].map((item, index) => { 
@@ -103,40 +107,46 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
   return (
     <div className='flex flex-col'>  
       <button style={{position: "fixed", top: 0, left: 0, 'marginTop': '10px', width: '100%', "backgroundColor": "lightgreen"}}
-        onClick={handleSavePOI} disabled
-      > 
+        onClick={handleSavePOI} disabled > 
         Map of Point Of Interest
       </button>      
       <MapContainer center={[40.57567910962963, 17.11605548858643]}
         zoom={15}     
         style={{ height: '400px', width: '100%', border: 'solid 2px black', position: "fixed", top: 60, left: 0 }}
-        ref={mapRef}
-      >      
-      <TileLayer 
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      <NewMarker setMarkers={setMarkers} markers={markers} newPOI={newPOI} setNewPOI={setNewPOI}/>    
-      { 
-        markers.map((marker, index) =>(
-          <Marker
-            key={marker._id}
-            icon={L.icon({iconUrl:  marker.imgURL, iconSize: [30,30]})}
-            position={[marker.lat, marker.lon]}
-            draggable={true} 
-            eventHandlers={{ dragend: (event) => handleMarkerDragEnd(marker._id, event), //gestisce lo spostamento del marker
-                             click: (event) => handlePoiClick(index), //gestisce il click sul POI
-            }}
-            ref={(markerRef) => {
-            // Aggiungi la ref corrente al vettore delle refs dei marker
-              markerRefs.current[index] = markerRef;
-            }}
-          >
-          <Popup className='text-justify'>{marker.text}</Popup>
-          </Marker>
-          ) // ~ callback in map
-        ) //~ map
-      }   
+        ref={mapRef} >      
+        <TileLayer 
+          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {
+          markers.filter(item => item.type === 'path').map((path, index) => {
+            return (
+                <AntPath key = {index} path={path} />
+              )
+          }) // ~ filter.map
+        }
+
+        <NewMarker setMarkers={setMarkers} markers={markers} newPOI={newPOI} setNewPOI={setNewPOI}/>    
+        { 
+          markers.filter(item => item.type !== 'path').map((marker, index) =>(
+            <Marker
+              key={marker._id}
+              icon={L.icon({iconUrl:  marker.imgURL, iconSize: [30,30]})}
+              position={[marker.lat, marker.lon]}
+              draggable={true} 
+              eventHandlers={{ dragend: (event) => handleMarkerDragEnd(marker._id, event), //gestisce lo spostamento del marker
+                              click: (event) => handlePoiClick(index), //gestisce il click sul POI
+              }}
+              ref={(markerRef) => {
+              // Aggiungi la ref corrente al vettore delle refs dei marker
+                markerRefs.current[index] = markerRef;
+              }}
+            >
+            <Popup className='text-justify'>{marker.text}</Popup>
+            </Marker>
+            ) // ~ callback in map
+          ) //~ map
+        }   
       </MapContainer> 
       <div style={{'marginTop': '430px' , "border":"2px solid black", "paddingBottom": "10px"}}  >
         <Elenco markers={markers} onMarkerSelect={handleSelectChange} onPopupChange={handlePopupChange} 
@@ -183,7 +193,7 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
   return (
     <div> 
       <h2>Elenco Point Of Interest</h2>   
-      {markers.map((marker, index) => (  
+      {markers.filter(items => items.type !== 'path').map((marker, index) => (  
         <div key={marker._id} className='mr-5 '>
           <input className="border-2 w-7 pr-1 text-right"  value={index+1} readOnly/>
           <input className="border-2 pl-1" value={marker.lat} readOnly />
@@ -209,7 +219,7 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
     </div> 
   );
 }
-
+/*
 function NewMarker({setMarkers, markers, setNewPOI, newPOI}){  // inserisce nuovo marker col tasto dx del mouse
   
   const map = useMapEvent({
@@ -226,12 +236,16 @@ function NewMarker({setMarkers, markers, setNewPOI, newPOI}){  // inserisce nuov
         remove: true,
         changed: true
       }
-      setMarkers([...markers, i]); // ~ setMarkers
+      let index = markers.findIndex(item => item.type == 'path') // trovo il primo elemento path
+      //console.log("****", index)
+      markers.splice(index, 0, i) // e aggiungo il nuovo poi davanri al primo path
+      setMarkers(markers)
+      //setMarkers([...markers, i]); // ~ setMarkers
       setNewPOI([...newPOI, i]);
       //console.log('*******', newPOI) 
     } // ~ contexmenu
   })  // ~ useMapEvent
   return null;
 } // ~ f
-
+*/
 export default Test;

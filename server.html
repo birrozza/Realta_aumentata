@@ -1,10 +1,12 @@
 <!doctype html>
-<!--  https://www.maps.ie/coordinates.html -->
+<!--  https://www.maps.ie/coordinates.html 
+https://www.npmjs.com/package/aframe-aim-component
+-->
 <html>
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>GAT A.R.</title>
+        <title>Location A.R.</title>
         <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
         <!--<script src="https://github.com/supermedium/superframe/blob/master/components/look-at/dist/aframe-look-at-component.min.js"></script>-->
         <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
@@ -34,6 +36,9 @@
         </style>
     </head>
     <script>
+        let eta = Date.now(); // contiene l'orario
+        let path = []; // contiene i dati del path
+        let oldPath = []; // contiene il vecchio path
         let oldData = []; // contiene gli elementi già presenti in DOM
         //let newData = []; // contiene gli elementi scaricati dal server
         let unicID; // identificativo unico del dispositivo
@@ -90,14 +95,15 @@
                     text.setAttribute("value", item.text);
                     text.setAttribute("name", item.text);
                     text.object3D.scale.set(5, 5, 5);
-                    text.setAttribute('opacity', '0.8')
+                    text.setAttribute('color', '#fff')
+                    text.setAttribute('opacity', '1')
                     
                     //text.setAttribute('remove','true')
                     //text.setAttribute("scale", "10 10 10");
                     /*compoundEntity.appendChild(img);
                     compoundEntity.appendChild(text);
                     document.querySelector("a-scene").appendChild(compoundEntity);*/
-                    sfondo.setAttribute('width', text.getAttribute('value').length*0.2)
+                    sfondo.setAttribute('width', ((text.getAttribute('value').length)+12)*0.12)
                         
                     document.querySelector("a-scene").appendChild(img);                    
                     document.querySelector("a-scene").appendChild(text);
@@ -119,7 +125,7 @@
             let text = location.getAttribute('name') + " ";
             let distance = location.components['gps-new-entity-place'].distance;
             distance = distance ? Math.round(distance) + " meters" : " --- ";
-            return text + distance;
+            return text + '@ ' + distance;
         }
         
         function confrontaElementi (obj1, obj2){ // confronto gli elementi 
@@ -144,6 +150,7 @@
         }
 
         function queryInterval(el, off_line){           
+            uniqueURL = `/directory?id=${unicID}&lat=${path[0]}&lon=${path[1]}&eta=${eta}`;
             fetch(uniqueURL, {mode: 'cors', headers: { 'Content-Type': 'application/json',}})
             .then(response => {
                 if(!response.ok){
@@ -152,7 +159,8 @@
                     //return Promise.reject(response);
                 }
                 return response.json();
-            }).then(data => {
+            }).then(response => {
+                const data = response.filter(item => item.type !== 'path'); // rimuovo i dati relativo ai path
                 if(!intervallo) { // se all'avvio
                     loader.setAttribute("style", "display: none;"); 
                     const x = setInterval(() => {                        
@@ -199,6 +207,8 @@
                         console.log("nessun nuovo elemento");
                     } // ~ if else
                 }
+                path = [0,0]; // azzero il path
+                eta = 0;  // azzero eta
                 document.getElementById('text-camera').setAttribute("value","Server");
             }).catch(err => {
                 console.log('Fetch problem: ' + err.message);
@@ -248,7 +258,7 @@
             //unicID = "ID-" + Date.now() + "-" + Math.round(Math.random() * 1000);
             //console.log('=>', unicID);
             document.getElementById('unicID-text').setAttribute('value', unicID);         
-            uniqueURL = `/directory?id=${unicID}&b=val2`;
+            //uniqueURL = `/directory?id=${unicID}&path=${path}`;
             
             let blinkig = setInterval(() => {
                 blink ? off_line.setAttribute("opacity", 0): off_line.setAttribute("opacity", 1);
@@ -259,7 +269,9 @@
 
             el.addEventListener("gps-camera-update-position", async(e) =>{
                 lon_text.setAttribute("value", "lon: " + e.detail.position.longitude);
-                lat_text.setAttribute("value", "lat: " + e.detail.position.latitude);                 
+                lat_text.setAttribute("value", "lat: " + e.detail.position.latitude);  
+                path = [e.detail.position.latitude, e.detail.position.longitude];   
+                eta = Date.now();            
             });
           
             queryInterval(el, off_line);
@@ -292,8 +304,8 @@
                     id="text-camera"
                 ></a-text>
                 <a-plane position="-0.21 -0.17 -1" opacity="0.5" width=".5" height=".14" color="#000"></a-plane>
-                <a-text id="lat-text" value="lat: ---" width="1" color="#00ff00" position="-0.45 -0.13 -1"></a-text>
-                <a-text id="lon-text" value="lon: ---" width="1" color="#00ff00" position="-0.45 -0.17 -1"></a-text> 
+                <a-text id="lat-text" value="lat:   Waiting for" width="1" color="#00ff00" position="-0.45 -0.13 -1"></a-text>
+                <a-text id="lon-text" value="lon:  GPS data..." width="1" color="#00ff00" position="-0.45 -0.17 -1"></a-text> 
                 <a-text id="unicID-text" value="" width="1" color="magenta" position="-0.45 -0.21 -1" ></a-text>               
                 <!--<a-entity position="-0.20 -0.25 -1" testo-con-sfondo="valore: Ciao Mondo"></a-entity>-->
             </a-camera>

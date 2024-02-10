@@ -29,6 +29,35 @@ const __dirname = path.dirname(__filename);
 
 let data = []; 
 const app = express();
+let pathItems = [{
+    type: "path",
+    name: "path1",
+    path: [
+        [40.58149728574267, 17.123394012451175],
+        [40.57734149729511, 17.12176322937012],
+        [40.57572800397406, 17.118930816650394],
+        [40.571180677081266, 17.123115062713627],
+      ],
+    eta: [
+      1707589900088,
+      1707589998886,
+      1707590032165
+    ]  
+  },{
+    type: "path",  
+    name: "path2",
+    path: [
+        [40.57714999886029, 17.117072045803074],
+        [40.57731705071694, 17.116886973381046],
+        [40.5770277655302, 17.114875316619877],
+        [40.5785352943267, 17.112970948219303],
+      ],
+    eta: [
+      1707589900088,
+      1707589998886,
+      1707590032165
+    ] 
+}];
 
 app.use('/assets', express.static('assets')); // per poter recuperare i file immagine
 //app.use('/src', express.static('src')); // per poter recuperare i file immagine
@@ -107,10 +136,35 @@ app.get('/', (req, res) =>{
 
 // risponde alle richieste di dati delle webapp
 app.get('/directory', (req, res) => { // `/directory?id=${unicID}&b=val2`
-    const {id, b} = req.query; 
-    res.status(200).json(data);
-    console.log('Send ok -', id, b)
-});
+    let {id, lat, lon, eta} = req.query; // dissocio i parametri 
+    if (lat !== "0" && !isNaN(lat)) { // se mi sono arrivati i dati del gps
+      lat = parseFloat(lat);
+      lon = parseFloat(lon);
+      
+      const found = pathItems.find(i => i.name == id); // verifico se l'elemento è già registrato
+      if (found) { // se è già registrato aggiorno le ccordinate gps
+        console.log(`aggiungo coordinate gps a ${id}`)
+        console.log(found.path)
+        found.path.push([lat, lon]);
+        found.eta.push(parseInt(eta));
+        //console.log(pathItems[found])
+      } else { // id sconosciuto allora lo aggiungo
+        console.log(`Aggiungo a pathItems l'elemento ${id} `)
+        const obj = {
+          name: id,
+          type: "path",
+          path: [[lat, lon]],
+          eta: [parseInt(eta)] 
+        };
+        pathItems.push(obj);
+        console.log(pathItems)     
+      } // ~ found / not found
+    }
+    const json = [...data, ...pathItems];
+    res.status(200).json(json);
+    console.log('Send ok -', id,  lat, lon, eta)
+  }
+); // ~ get
 
 // Endpoint per inserire un oggetto nel database
 app.post('/addpoi', async (req, res) => {

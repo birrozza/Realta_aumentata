@@ -1,4 +1,4 @@
-import { useState } from 'react';
+/*import { useState } from 'react';
 import { Marker, Popup, Tooltip } from 'react-leaflet';
 
 function Poi({poi}){
@@ -24,4 +24,4 @@ function Poi({poi}){
     )
 }
 
-export default Poi;
+export default Poi;*/

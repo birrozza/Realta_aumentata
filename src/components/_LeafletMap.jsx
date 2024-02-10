@@ -1,5 +1,5 @@
 // LeafletMap.js
-import React from 'react';
+/*import React from 'react';
 import { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMap, useMapEvent } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -35,4 +35,4 @@ function LeafletMap( {poi} ){
   );
 }
 
-export default LeafletMap;
+export default LeafletMap;*/
