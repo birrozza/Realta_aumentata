@@ -7,8 +7,8 @@
  ********************************/
 
 //import { Renderer, marker } from 'leaflet';
-import React, { useState, useRef, useEffect } from 'react';
-import { TileLayer, MapContainer, Marker, Popup, Tooltip } from 'react-leaflet';
+import React, { useState, useRef } from 'react';
+import { TileLayer, MapContainer, Marker, Popup } from 'react-leaflet';
 //import { useMap, useMapEvent } from 'react-leaflet/hooks';
 import AntPath from './AntPath';
 import NewMarker from './NewMarker';
@@ -181,7 +181,8 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
       /*const copy=oldPOI.map(x=>x);*/      
       //setOldPOI(oldPOI); // aggiorno la lista dei vecchi POI   
       console.log('invio al server da cancellare', markers[index]);  
-      setPoiDaCancellare(markers[index]); // lo rimando in app.jsx 
+      //setPoiDaCancellare(markers[index]); // lo rimando in app.jsx 
+      setPoiDaCancellare(markers.filter(item => item._id === markerId));
     } 
     //inputRefs.current.splice(index,1)
     //markers.splice(index,1); // elimino il marker dalla lista dei marker 

@@ -223,13 +223,12 @@ app.get('/mappa', (req, res) => {
     res.sendFile('index.html',{root: __dirname +'/dist/'})
   })
 
-
-
-//server.listen(port, () => console.log(`Server running at https://localhost:${port}/\nor https://192.168.1.59:3000/\nverify width ipconfig (IPV4)`));
-    
-// Insert the article in our MongoDB database
-//await POI.create(data);
-//const a = await doc.find();
-//console.log(a)
-
+  /*
+  modificare i 3 endpoint in App.jsx
+  e fare npm run buid
+  i file generati bisogna copiarli in 
+  C:\Users\computer\Desktop\Realta_aumentata\assets
+  e fare il commit per renderli disponibili su render.com
+  link: https://arsever.onrender.com/server  
+  */
 
