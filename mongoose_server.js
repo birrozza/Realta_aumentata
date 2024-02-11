@@ -126,7 +126,7 @@ mongoose.connect(mongodb/*, {useNewUrlParser: true, useUnifiedTopology: true}*/)
         recuperaPoi(); 
         //console.log('avvio il recupero POI ciclico');    
         //globalThis.setInterval(() => recuperaPoi(), 10000); // 
-        server.listen(port, () => console.log(` Server running at https://localhost:${port}/\n or https://192.168.1.59:3000/\n verify width ipconfig (IPV4)`));
+        server.listen(port, () => console.log(` Server running at https://localhost:${port}/\n or https://192.168.1.62:3000/\n verify width ipconfig (IPV4)`));
  
     }).catch(err => console.log("errore durante la connessione a mongoDB", err));
 

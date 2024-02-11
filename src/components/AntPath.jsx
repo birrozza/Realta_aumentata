@@ -31,11 +31,12 @@ export default function AntPath({ path }){
         "yellow", "yellowgreen"
     ];
     let indiceCasuale = Math.floor(Math.random() * colori.length);
-    const eta = path.eta[path.eta.length-1] - path.eta[0]
-    console.log(path.eta[path.eta.length-1] , path.eta[0], path.eta.length)
+    const eta = new Date(path.eta[path.eta.length-1] - path.eta[0])
+    //console.log(path.eta[path.eta.length-1] , path.eta[0], path.eta.length)
     const options = { use: L.polyline, delay: 8000, dashArray: [10,10], weight: 5, color: colori[indiceCasuale], pulseColor: "#FFFFFF" };
     const pathItem = antPath(pathLatLng, options);
-    pathItem.bindTooltip(`name: ${path.name}\neta: ${eta/1000}`, {sticky: true, attribution: "oppp"}).openTooltip();
+    pathItem.bindTooltip(`<strong><em>Name:</strong> ${path.name}<br /><strong>Eta:</strong> ${eta.getMinutes()}'${eta.getSeconds()}"`, 
+        {sticky: true, attribution: "oppp", className: "text-left"}).openTooltip();
     map.addLayer(pathItem);   
     
     return null

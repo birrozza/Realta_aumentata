@@ -22,8 +22,8 @@ function App() {
     console.log('in app => elemento da cancellare', poiDaCancellare)
     const idPoiDaCancellare = poiDaCancellare._id;     
         
-    const url = `https://localhost:3000/delete?id=${idPoiDaCancellare}`
-    //const url = `/delete?id=${idPoiDaCancellare}`
+    //const url = `https://localhost:3000/delete?id=${idPoiDaCancellare}` // per mongooseserver
+    const url = `/delete?id=${idPoiDaCancellare}` // per rendererver
     fetch(url , 
         {
           method: 'DELETE', 
@@ -54,8 +54,8 @@ function App() {
     if (nuoviPoi.length < 1) return;
     console.log('in app aggiornare', nuoviPoi)
     const oldID = nuoviPoi._id; // prendo id provvisorio del nuovo poi
-    //fetch(/*'https://localhost:3000*/'/addpoi', // effettuo chiamata
-    fetch('https://localhost:3000/addpoi', // effettuo chiamata
+    fetch(/*'https://localhost:3000*/'/addpoi', // effettuo chiamata per renderserver
+    //fetch('https://localhost:3000/addpoi', // effettuo chiamata per mongooseserver
         {
           method: 'POST', 
           body: JSON.stringify(nuoviPoi),
@@ -95,8 +95,8 @@ function App() {
   )
   // uso server
   useEffect(() => { // recupera i dati all'avvio
-    //fetch(/*"https://localhost:3000*/"/directory?id=react&b=val2", 
-    fetch("https://localhost:3000/directory?id=mappa&b=val2", 
+    fetch(/*"https://localhost:3000*/"/directory?id=react&b=val2", // per renderserver 
+    //fetch("https://localhost:3000/directory?id=mappa&b=val2",  // per mongooseserver
       {mode: 'cors', headers: { 'Content-Type': 'application/json',}})
     .then(response => {
       if(!response.ok){
