@@ -180,9 +180,10 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
       //console.log('el can',vecchioPOI)
       /*const copy=oldPOI.map(x=>x);*/      
       //setOldPOI(oldPOI); // aggiorno la lista dei vecchi POI   
-      console.log('invio al server da cancellare', markers[index]);  
+      const a = markers.filter(item => item._id === markerId); // prendo l'elemento da cancellare
+      console.log('invio al server da cancellare', a[0]);  // filter mi genera un array col solo elemento da cancellare
       //setPoiDaCancellare(markers[index]); // lo rimando in app.jsx 
-      setPoiDaCancellare(markers.filter(item => item._id === markerId));
+      setPoiDaCancellare(a[0]); // lo rimando in app.jsx
     } 
     //inputRefs.current.splice(index,1)
     //markers.splice(index,1); // elimino il marker dalla lista dei marker 

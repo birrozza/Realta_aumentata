@@ -13,6 +13,8 @@ import Test from './components/Test';
 //import { useRealmApp } from 'realm-web';
 
 function App() {
+  //const localURL = 'https://localhost:3000'; // per mongooseserver
+  const localURL = ''; //per renderserver
   const [markers, setMarkers] = useState([]); 
   const [nuoviPoi, setNuoviPoi] = useState([])
   const [poiDaCancellare, setPoiDaCancellare] = useState([])
@@ -23,12 +25,12 @@ function App() {
     const idPoiDaCancellare = poiDaCancellare._id;     
         
     //const url = `https://localhost:3000/delete?id=${idPoiDaCancellare}` // per mongooseserver
-    const url = `/delete?id=${idPoiDaCancellare}` // per rendererver
+    const url = localURL + `/delete?id=${idPoiDaCancellare}` // per rendererver
     fetch(url , 
         {
           method: 'DELETE', 
-          body: JSON.stringify(poiDaCancellare),
-          headers: {'Content-Type': 'application/json'},
+          /*body: JSON.stringify(poiDaCancellare),
+          headers: {'Content-Type': 'application/json'},*/
         }
       )
       .then(res => res.json())
@@ -54,7 +56,7 @@ function App() {
     if (nuoviPoi.length < 1) return;
     console.log('in app aggiornare', nuoviPoi)
     const oldID = nuoviPoi._id; // prendo id provvisorio del nuovo poi
-    fetch(/*'https://localhost:3000*/'/addpoi', // effettuo chiamata per renderserver
+    fetch(localURL + '/addpoi', // effettuo chiamata per renderserver
     //fetch('https://localhost:3000/addpoi', // effettuo chiamata per mongooseserver
         {
           method: 'POST', 
@@ -95,7 +97,7 @@ function App() {
   )
   // uso server
   useEffect(() => { // recupera i dati all'avvio
-    fetch(/*"https://localhost:3000*/"/directory?id=react&b=val2", // per renderserver 
+    fetch(localURL + "/directory?id=react&b=val2", // per renderserver 
     //fetch("https://localhost:3000/directory?id=mappa&b=val2",  // per mongooseserver
       {mode: 'cors', headers: { 'Content-Type': 'application/json',}})
     .then(response => {

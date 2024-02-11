@@ -225,8 +225,8 @@ app.delete('/delete', async (req, res) => {
   }
 });
 
-app.get('/server', (req, res) => {
-    res.sendFile('server.html',{root: __dirname +'/'})
+app.get('/app', (req, res) => {
+    res.sendFile('app.html',{root: __dirname +'/'})
 })
 
 app.get('/mappa', (req, res) => {
