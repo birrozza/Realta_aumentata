@@ -5,6 +5,7 @@ import './App.css'
 //import LeafletMap from './components/LeafletMap';
 //import Elenco from './components/Elenco';
 import Test from './components/Test';
+import Notifica from './components/Notifica';
 //import SheetComponent from './components/AntPath';
 //import { set } from 'mongoose';
 //import axios from "axios";
@@ -12,7 +13,9 @@ import Test from './components/Test';
 //import { MongoClient } from 'mongodb';
 //import { useRealmApp } from 'realm-web';
 
+
 function App() {
+  
   //const localURL = 'https://localhost:3000'; // per mongooseserver
   const localURL = ''; //per renderserver
   const [markers, setMarkers] = useState([]); 
@@ -111,7 +114,8 @@ function App() {
     .then(data => {
       console.log('in app, dati ricevuti: ',data);
       //setPoi(data);     
-      setMarkers(data)       
+      setMarkers(data)
+      //return (<Notifica />);      
     })
     .catch(e => {
       console.log(e);
@@ -123,7 +127,7 @@ function App() {
     return  (
       <>
         {/*<LeafletMap  poi= {poi}/> */}  
-        {/*<SheetComponent message = ""/>*/}    
+        {/*<SheetComponent message = ""/>*/}          
         <Test markers={markers} setMarkers={setMarkers} setNuoviPoi={setNuoviPoi} setPoiDaCancellare={setPoiDaCancellare} />
         {/*<Elenco poi= {poi} />*/}
       </>

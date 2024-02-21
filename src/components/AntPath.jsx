@@ -1,6 +1,6 @@
+// https://rubenspgcavalcante.github.io/leaflet-ant-path/
 import { useMap } from 'react-leaflet/hooks';
 import { antPath } from 'leaflet-ant-path';
-//import { tooltip } from 'leaflet';
 
 export default function AntPath({ path }){
     if (path == null) return

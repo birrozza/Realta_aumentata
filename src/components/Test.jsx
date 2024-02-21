@@ -2,8 +2,9 @@
  *  l'inserimento di un nuovo POI
  *  viene gestito dal componente
  *  NewMarker ed è col tasto dx 
- *  https://rubenspgcavalcante.github.io/leaflet-ant-path/
  *  https://gitlab.com/manuel.richter95/leaflet.notifications
+ *  https://github.com/cbaines/leaflet-indoor
+ * https://bopen.github.io/leaflet-area-selection/  
  ********************************/
 
 //import { Renderer, marker } from 'leaflet';
@@ -13,6 +14,7 @@ import { TileLayer, MapContainer, Marker, Popup } from 'react-leaflet';
 import AntPath from './AntPath';
 import NewMarker from './NewMarker';
 import 'leaflet/dist/leaflet.css';
+import MapOver from './MapOver';
 
 let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
   //const [markers, setMarkers] = useState(poi); 
@@ -71,7 +73,7 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
     handlePoiClick(i); // evidenzia l'input-text del marker selezionato
     markerRefs.current[i].openPopup(); // attiva il popup sull'elemento individuato
     const {lat, lng} = markerRefs.current[i]._latlng; //prendi le coordinate del popup attivo 
-    mapRef.current.flyTo([lat,lng], 18); // punta la mappa sul poi selezionato
+    mapRef.current.flyTo([lat,lng], 20); // punta la mappa sul poi selezionato
     markerRefs.current[i].openPopup(); // attiva il popup sull'elemento individuato
     //mapRef.current.setZoom(20)
     if (e.type != 'change') return;
@@ -105,19 +107,23 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
   };
   
   return (
-    <div className='flex flex-col'>  
-      <button style={{position: "fixed", top: 0, left: 0, 'marginTop': '10px', width: '100%', "backgroundColor": "lightgreen"}}
+    <div className=' grid-cols-1 p-0 m-0'>  
+      <button style={{position: "fixed", top: 0, left: 0, 'marginTop': '10px', width: '100%', "backgroundColor": "lightgreen",
+      }}
         onClick={handleSavePOI} disabled > 
         Map of Point Of Interest
       </button>      
       <MapContainer center={[40.57567910962963, 17.11605548858643]}
-        zoom={15}     
-        style={{ height: '400px', width: '100%', border: 'solid 2px black', position: "fixed", top: 60, left: 0 }}
-        ref={mapRef} >      
+        zoom={18}     
+        style={{ height: 'calc(55vh - 30px)', width: '99%', border: 'solid 1px black', position: "fixed", top: "60px", left: "0px", 
+        boxShadow: '3px 3px 6px #303030', margin: '0 5px', borderRadius: '5px', boxSizing: 'border-box', overflow: 'hidden'}}
+        ref={mapRef} >    
         <TileLayer 
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          maxZoom = "21"
         />
+        <MapOver />
         {
           markers.filter(item => item.type === 'path').map((path, index) => {
             return (
@@ -148,7 +154,9 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
           ) //~ map
         }   
       </MapContainer> 
-      <div style={{'marginTop': '430px' , "border":"2px solid black", "paddingBottom": "10px"}}  >
+      <div style={{marginTop: 'calc(60vh - 20px)' , border: '1px solid black', paddingBottom: "10px", 
+      overflowY: "auto",  height: 'calc(35vh - 20px)', 'boxShadow':'3px 3px 6px #303030', borderRadius: '5px',
+      padding: '5px 10px', fontFamily: 'source-code-pro,Menlo,Monaco,Consolas,"Courier New",monospace' }}  >
         <Elenco markers={markers} onMarkerSelect={handleSelectChange} onPopupChange={handlePopupChange} 
                 setMarkers={setMarkers} inputRefs={inputRefs} newPOI={newPOI} setNewPOI={setNewPOI}
                 oldPOI={oldPOI} setOldPOI={setOldPOI} setPoiDaCancellare={setPoiDaCancellare} handleSavePOI={handleSavePOI} 
@@ -214,7 +222,7 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
             defaultValue={marker.text}  
             onClick={(e) => onPopupChange(marker._id,e, index, )}  
             onChange={(e) => onPopupChange(marker._id,e, index)}/>
-          <button type="submit" className='border-slate-800 p-0 ml-1 w-16' onClick={(e) => handleDeleteButton(marker._id, e, index)} >Delete</button>
+          <button type="submit" className='border-slate-800 p-0 ml-1 w-16 bg-slate-50' onClick={(e) => handleDeleteButton(marker._id, e, index)} >Delete</button>
           {marker.changed ? <button type='submit' className='border-slate-800 p-0 ml-1 w-16 bg-lime-500' onClick={(e) => handleSavePOI(marker._id, e, index)}>Save</button> : null}
         </div>
       ))}
