@@ -1,11 +1,12 @@
 // test2 = R39HvJBzewVVyJN3zV3oAH5oSHJnmDmVpRRWHsfnuTS7sr5peftD2iMtk9smEKSs
 // npm run client
+import Test from './components/Test';
 import { useEffect, useState } from 'react'
 import './App.css'
 //import LeafletMap from './components/LeafletMap';
 //import Elenco from './components/Elenco';
-import Test from './components/Test';
-import Notifica from './components/Notifica';
+
+//import Notifica from './components/Notifica';
 //import SheetComponent from './components/AntPath';
 //import { set } from 'mongoose';
 //import axios from "axios";
@@ -21,6 +22,7 @@ function App() {
   const [markers, setMarkers] = useState([]); 
   const [nuoviPoi, setNuoviPoi] = useState([])
   const [poiDaCancellare, setPoiDaCancellare] = useState([])
+  const [notifica, setNotifica] = useState({type:'idle', msg: ''})
   
   useEffect(()=>{  // eliminazione poi    
     if (poiDaCancellare.length<1) return;
@@ -39,7 +41,8 @@ function App() {
       .then(res => res.json())
       .then(risposta => { 
           if (risposta.status == 'success') {
-            alert(`Elemento eliminato con successo`)
+            //alert(`Elemento eliminato con successo`)
+            setNotifica({type: 'succes', msg: 'Elemento eliminato con successo'})
             const a = markers.filter(item => item._id != idPoiDaCancellare); // aggiorno eliminando l'elemento 
             setMarkers(a);
             console.log('Risposta server ', risposta)
@@ -48,7 +51,8 @@ function App() {
       )
       .catch(err => {
         console.log("errore col server", err)
-        alert(`Errore collegamento server \n${err}`)
+        //alert(`Errore collegamento server \n${err}`)
+        setNotifica({type: 'alert', msg: `Errore collegamento server \n${err}`})
         //setMarkers([...markers, copiaPoiDaCancellare[0]]); // reinserito in coda
         //setMarkers(copiaPoi)
       })
@@ -89,12 +93,14 @@ function App() {
             ); //~ map
           } else console.log('risposta non gestita', risposta);
           setMarkers(updatedMarkers); // aggiorno lo stato della lista dei markers
-          alert(msg);        
+          //alert(msg);
+          setNotifica({type: 'succes', msg: msg})       
         } 
       )
       .catch(err => {
         console.log("errore col server", err)
-        alert(`Aggiorna la pagina...\nErrore collegamento server \n${err}`)
+        //alert(`Aggiorna la pagina...\nErrore collegamento server \n${err}`)
+        setNotifica({type: 'alert', msg: `Aggiorna la pagina...\nErrore collegamento server \n${err}`})
       })
     },[nuoviPoi]
   )
@@ -115,11 +121,10 @@ function App() {
       console.log('in app, dati ricevuti: ',data);
       //setPoi(data);     
       setMarkers(data)
-      //return (<Notifica />);      
     })
     .catch(e => {
       console.log(e);
-      alert(`Errore collegamento server \nFai un refresh della pagina...\n${e}`)
+      alert(`Errore collegamento server \nFai un refresh della pagina...\n${e}`);      
     });
   },[]);
   
@@ -128,7 +133,8 @@ function App() {
       <>
         {/*<LeafletMap  poi= {poi}/> */}  
         {/*<SheetComponent message = ""/>*/}          
-        <Test markers={markers} setMarkers={setMarkers} setNuoviPoi={setNuoviPoi} setPoiDaCancellare={setPoiDaCancellare} />
+        <Test markers={markers} setMarkers={setMarkers} setNuoviPoi={setNuoviPoi} setPoiDaCancellare={setPoiDaCancellare} 
+        notifica={notifica} />
         {/*<Elenco poi= {poi} />*/}
       </>
     ) 

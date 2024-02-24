@@ -1,31 +1,41 @@
-//import { useMap } from 'react-leaflet/hooks';
-//import L from "leaflet";
-//import Notifications from 'leaflet-notifications';
-import React from 'react';
+import { useMap } from 'react-leaflet/hooks';
+import L from "leaflet";
+import './leaflet-notifications/leaflet-notifications.js'
+import './leaflet-notifications/leaflet-notifications.css'
+//import './leaflet-notifications/font-awesome.min.css'
+import { useEffect } from 'react';
 
-export default function Notifica () {
-    /*const mymap = useMap();
-    console.log('*********************in notification')
-    let notification = L.control
-    .notifications({
-        timeout: 3000,
-        position: 'topright',
-        closable: true,
-        dismissable: true,
-    })
-    .addTo(mymap);
+function Notifica ( { notifica } ){
+    const mymap = useMap();
+    //console.log('*****',notifica.type)
+    
+    useEffect (() => {
+        let notification = L.control
+        .notifications({
+            //className: 'pastel',
+            timeout: 3000,
+            position: 'bottomright',
+            closable: true,
+            dismissable: true,
+            marginLeft: '10px',
+            icons: {alert: 'fa fa-exclamation-circle'}
+            
+        })
+        .addTo(mymap);
 
-    notification.info('Info', 'some infomessage');
-    */
-    console.log('*********************in notification')
-    return (
-        <>
-            <dialog open>
-                <p>Greetings, one and all!</p>
-                <form method="dialog">
-                    <button>OK</button>
-                </form>
-            </dialog>
-        </>
-    )
+        switch (notifica.type) {
+            case 'succes': notification.success('SUCCES', `<em>${notifica.msg}</em>`);
+                break;
+            case 'alert': notification.alert('ALERT', `<em>${notifica.msg}</em>`);
+                break;  
+            default: null; 
+        }
+        return () => {            
+            notification.remove();            
+        }
+    }, [notifica])
+    
+    return null;
 }
+
+export default Notifica;

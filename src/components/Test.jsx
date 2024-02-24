@@ -4,21 +4,21 @@
  *  NewMarker ed è col tasto dx 
  *  https://gitlab.com/manuel.richter95/leaflet.notifications
  *  https://github.com/cbaines/leaflet-indoor
- * https://bopen.github.io/leaflet-area-selection/  
+ *  https://bopen.github.io/leaflet-area-selection/  
  ********************************/
 
 //import { Renderer, marker } from 'leaflet';
 import { useState, useRef } from 'react';
-import { TileLayer, MapContainer, Marker, Popup } from 'react-leaflet';
+import { TileLayer, MapContainer, Marker, Popup, useMap } from 'react-leaflet';
 //import { useMap, useMapEvent } from 'react-leaflet/hooks';
 import AntPath from './AntPath';
 import NewMarker from './NewMarker';
 import 'leaflet/dist/leaflet.css';
 import MapOver from './MapOver';
 import Slider from './Slider';
+import Notifica from './Notifica';
 
-
-let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
+let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, setNotifica}) => {
   //const [markers, setMarkers] = useState(poi); 
   const [opacity, setOpacity] = useState(0.7);
   const [newPOI, setNewPOI] = useState([]);  // contiene i nuovi poi 
@@ -136,7 +136,7 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
               )
           }) // ~ filter.map
         }
-        
+        <Notifica notifica = {notifica} />
         <NewMarker setMarkers={setMarkers} markers={markers} newPOI={newPOI} setNewPOI={setNewPOI}/>    
         { 
           markers.filter(item => item.type !== 'path').map((marker, index) =>(
@@ -157,7 +157,8 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
             </Marker>
             ) // ~ callback in map
           ) //~ map
-        }   
+        } 
+          
       </MapContainer> 
       
       <div style={{marginTop: 'calc(60vh - 20px)' , border: '1px solid black', paddingBottom: "10px", 
@@ -184,6 +185,7 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
       setNewPOI(newPOI); // e cambio lo stato
       const b = markers.filter(item => item._id != markerId); //elimino dalla lista l'elemento cancellato 
       setMarkers(b); // aggiorno la lista dei markers
+      
     }  else { // se non è tra i nuovi allora è vecchio      
       let x = oldPOI.findIndex((i) => i._id === markerId);
       console.log('Trovato elemento vecchio', x, index);
