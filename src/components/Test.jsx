@@ -8,16 +8,19 @@
  ********************************/
 
 //import { Renderer, marker } from 'leaflet';
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { TileLayer, MapContainer, Marker, Popup } from 'react-leaflet';
 //import { useMap, useMapEvent } from 'react-leaflet/hooks';
 import AntPath from './AntPath';
 import NewMarker from './NewMarker';
 import 'leaflet/dist/leaflet.css';
 import MapOver from './MapOver';
+import Slider from './Slider';
+
 
 let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
   //const [markers, setMarkers] = useState(poi); 
+  const [opacity, setOpacity] = useState(0.7);
   const [newPOI, setNewPOI] = useState([]);  // contiene i nuovi poi 
   const [oldPOI, setOldPOI] = useState(markers); // contiene i poi di origine che sono rimasti
   //const [deletedOldPOI, setDeletedOldPOI] = useState([{"i": 0}]) // lista dei vecchio POI cancellati
@@ -112,18 +115,20 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
       }}
         onClick={handleSavePOI} disabled > 
         Map of Point Of Interest
-      </button>      
+      </button>   
+         
       <MapContainer center={[40.57567910962963, 17.11605548858643]}
         zoom={18}     
         style={{ height: 'calc(55vh - 30px)', width: '99%', border: 'solid 1px black', position: "fixed", top: "60px", left: "0px", 
         boxShadow: '3px 3px 6px #303030', margin: '0 5px', borderRadius: '5px', boxSizing: 'border-box', overflow: 'hidden'}}
-        ref={mapRef} >    
+        ref={mapRef} > 
+        <Slider setOpacity = {setOpacity} opacity = {opacity}/>   
         <TileLayer 
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           maxZoom = "21"
         />
-        <MapOver />
+        <MapOver opacity = {opacity} />        
         {
           markers.filter(item => item.type === 'path').map((path, index) => {
             return (
@@ -131,7 +136,7 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
               )
           }) // ~ filter.map
         }
-
+        
         <NewMarker setMarkers={setMarkers} markers={markers} newPOI={newPOI} setNewPOI={setNewPOI}/>    
         { 
           markers.filter(item => item.type !== 'path').map((marker, index) =>(
@@ -154,6 +159,7 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare}) => {
           ) //~ map
         }   
       </MapContainer> 
+      
       <div style={{marginTop: 'calc(60vh - 20px)' , border: '1px solid black', paddingBottom: "10px", 
       overflowY: "auto",  height: 'calc(35vh - 20px)', 'boxShadow':'3px 3px 6px #303030', borderRadius: '5px',
       padding: '5px 10px', fontFamily: 'source-code-pro,Menlo,Monaco,Consolas,"Courier New",monospace' }}  >
@@ -229,33 +235,5 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
     </div> 
   );
 }
-/*
-function NewMarker({setMarkers, markers, setNewPOI, newPOI}){  // inserisce nuovo marker col tasto dx del mouse
-  
-  const map = useMapEvent({
-    contextmenu(e){
-      const i = { // lo aggiunge alla lista di marker
-        _id:  Date.now().toString().padStart(24,'0'), // per renderlo digeribile a mongoose
-        id_text: "text-new",
-        id_img: "new",
-        type: "location",
-        text: "....",
-        imgURL: '/assets/location.png',
-        lat: e.latlng.lat,
-        lon: e.latlng.lng,
-        remove: true,
-        changed: true
-      }
-      let index = markers.findIndex(item => item.type == 'path') // trovo il primo elemento path
-      //console.log("****", index)
-      markers.splice(index, 0, i) // e aggiungo il nuovo poi davanri al primo path
-      setMarkers(markers)
-      //setMarkers([...markers, i]); // ~ setMarkers
-      setNewPOI([...newPOI, i]);
-      //console.log('*******', newPOI) 
-    } // ~ contexmenu
-  })  // ~ useMapEvent
-  return null;
-} // ~ f
-*/
+
 export default Test;
