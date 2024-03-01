@@ -1,3 +1,7 @@
+/*******
+ * https://gitlab.com/manuel.richter95/leaflet.notifications
+ *******/
+
 import { useMap } from 'react-leaflet/hooks';
 import L from "leaflet";
 import './leaflet-notifications/leaflet-notifications.js'

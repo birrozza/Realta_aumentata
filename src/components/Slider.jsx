@@ -6,13 +6,14 @@ import { useEffect } from 'react';
 
 const Slider = ( {setOpacity, opacity}) => {
     const container = useMap();
+	//container.setMaxBounds([[40.58125469194737,17.104468850466237],[40.57197099511666,17.12703818134258]])
 
 	useEffect(()=> {
 
 		const slider = L.control.slider(function(value) {
 			// I have two layers whose opacity I have to vary
 			setOpacity(value)
-			console.log(value);
+			console.log('opacity',value);
 		}, { // slider options
 			orientation:'vertical', 
 			id: 'slider',

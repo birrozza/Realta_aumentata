@@ -3,22 +3,11 @@
 import Test from './components/Test';
 import { useEffect, useState } from 'react'
 import './App.css'
-//import LeafletMap from './components/LeafletMap';
-//import Elenco from './components/Elenco';
-
-//import Notifica from './components/Notifica';
-//import SheetComponent from './components/AntPath';
-//import { set } from 'mongoose';
-//import axios from "axios";
-//import mongoose from "mongoose";
-//import { MongoClient } from 'mongodb';
-//import { useRealmApp } from 'realm-web';
-
 
 function App() {
   
-  //const localURL = 'https://localhost:3000'; // per mongooseserver
-  const localURL = ''; //per renderserver
+  const localURL = 'https://localhost:3000'; // per mongooseserver
+  //const localURL = ''; //per renderserver
   const [markers, setMarkers] = useState([]); 
   const [nuoviPoi, setNuoviPoi] = useState([])
   const [poiDaCancellare, setPoiDaCancellare] = useState([])

@@ -104,7 +104,7 @@ function recuperaPoi(){
         data = documenti;
         data.map(item =>{
             switch (item.type) {
-              case "location": item.imgURL = '/assets/location.png';              
+              case "location": item.imgURL = '/assets/location2.png';              
                 break;
               case "alert": item.imgURL = '/assets/alert.png';              
                 break;
@@ -112,7 +112,7 @@ function recuperaPoi(){
                 break;      
               case "exit": item.imgURL = '/assets/uscita-emergenza.jpg';              
                 break;
-            } // ~ swith
+            } // ~ switch
         }); // ~ map
         return "ok"
     })

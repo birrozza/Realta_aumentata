@@ -2,12 +2,13 @@
  *  l'inserimento di un nuovo POI
  *  viene gestito dal componente
  *  NewMarker ed è col tasto dx 
- *  https://gitlab.com/manuel.richter95/leaflet.notifications
+ *  https://github.com/iatkin/leaflet-svgicon
  *  https://github.com/cbaines/leaflet-indoor
  *  https://bopen.github.io/leaflet-area-selection/  
+ *  https://github.com/mapshakers/leaflet-icon-pulse
  ********************************/
 
-//import { Renderer, marker } from 'leaflet';
+import L from 'leaflet';
 import { useState, useRef } from 'react';
 import { TileLayer, MapContainer, Marker, Popup, useMap } from 'react-leaflet';
 //import { useMap, useMapEvent } from 'react-leaflet/hooks';
@@ -17,6 +18,7 @@ import 'leaflet/dist/leaflet.css';
 import MapOver from './MapOver';
 import Slider from './Slider';
 import Notifica from './Notifica';
+import Poi from './Poi';
 
 let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, setNotifica}) => {
   //const [markers, setMarkers] = useState(poi); 
@@ -28,6 +30,7 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, set
   const markerRefs = useRef([]); // la lista di tutti gli elementi <Marker>
   const mapRef = useRef(); // riferimento alla mappa
   const inputRefs= useRef([]) // lista si tutti i tetxt <input> 
+  
 
   console.log('------------------------------------------------') 
   console.log('oldPOI',oldPOI)
@@ -99,7 +102,7 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, set
       if (value == "exit") newImgUrl = '/assets/uscita-emergenza.jpg';
       else if (value == "raccolta") newImgUrl = '/assets/raccolta.jpg';
       else if (value == "alert") newImgUrl = '/assets/alert.png';
-      else newImgUrl = '/assets/location.png';
+      else newImgUrl = '/assets/location2.png';
       const updatedMarkers = markers.map((marker) => 
         marker._id === markerId
           ? { ...marker, imgURL: newImgUrl , changed: true, type: value}
@@ -118,6 +121,8 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, set
       </button>   
          
       <MapContainer center={[40.57567910962963, 17.11605548858643]}
+        maxBounds={[[40.58125469194737,17.104468850466237],[40.57197099511666,17.12703818134258]]}
+        minZoom={15}
         zoom={18}     
         style={{ height: 'calc(55vh - 30px)', width: '99%', border: 'solid 1px black', position: "fixed", top: "60px", left: "0px", 
         boxShadow: '3px 3px 6px #303030', margin: '0 5px', borderRadius: '5px', boxSizing: 'border-box', overflow: 'hidden'}}
@@ -138,27 +143,42 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, set
         }
         <Notifica notifica = {notifica} />
         <NewMarker setMarkers={setMarkers} markers={markers} newPOI={newPOI} setNewPOI={setNewPOI}/>    
-        { 
-          markers.filter(item => item.type !== 'path').map((marker, index) =>(
-            <Marker
-              key={marker._id}
-              icon={L.icon({iconUrl:  marker.imgURL, iconSize: [30,30]})}
-              position={[marker.lat, marker.lon]}
-              draggable={true} 
-              eventHandlers={{ dragend: (event) => handleMarkerDragEnd(marker._id, event), //gestisce lo spostamento del marker
-                              click: (event) => handlePoiClick(index), //gestisce il click sul POI
-              }}
-              ref={(markerRef) => {
-              // Aggiungi la ref corrente al vettore delle refs dei marker
-                markerRefs.current[index] = markerRef;
-              }}
-            >
-            <Popup className='text-justify'>{marker.text}</Popup>
-            </Marker>
-            ) // ~ callback in map
-          ) //~ map
-        } 
-          
+        {/* 
+          markers.filter(item => item.type !== 'path').map((marker, index) =>{
+              return (
+                <Marker
+                  key={marker._id}
+                  icon={ L.icon({iconUrl: marker.imgURL, iconSize: [30,30] }) }
+                  position={[marker.lat, marker.lon]}
+                  draggable={true} 
+                  eventHandlers={{ dragend: (event) => handleMarkerDragEnd(marker._id, event), //gestisce lo spostamento del marker
+                                  click: (event) => handlePoiClick(index), //gestisce il click sul POI
+                  }}
+                  ref={(markerRef) => {
+                  // Aggiungi la ref corrente al vettore delle refs dei marker
+                    markerRefs.current[index] = markerRef;
+                  }}// ~ ref
+                >
+                <Popup className='text-justify'>{marker.text}</Popup>
+                </Marker>
+              ) // ~ return
+            } ) // ~ callback in map
+        */} 
+         
+        {
+          markers.filter(item => item.type !== 'path').map((marker, index) =>{
+            return (
+              <Poi 
+                key={marker._id} 
+                marker={marker} 
+                index={index}
+                handleMarkerDragEnd={handleMarkerDragEnd} 
+                handlePoiClick={handlePoiClick} 
+                markerRefs= {markerRefs}
+                /> 
+            ) // ~ return  
+          }) // ~ map   
+        }
       </MapContainer> 
       
       <div style={{marginTop: 'calc(60vh - 20px)' , border: '1px solid black', paddingBottom: "10px", 
