@@ -5,16 +5,17 @@
  *  https://github.com/iatkin/leaflet-svgicon
  *  https://github.com/cbaines/leaflet-indoor
  *  https://bopen.github.io/leaflet-area-selection/  
- *  https://github.com/mapshakers/leaflet-icon-pulse
+ *  https://github.com/ghybs/leaflet-defaulticon-compatibility
+ * [40.58125469194737,17.104468850466237],[40.57197099511666,17.12703818134258]
  ********************************/
 
-import L from 'leaflet';
+//import L from 'leaflet';
 import { useState, useRef } from 'react';
-import { TileLayer, MapContainer, Marker, Popup, useMap } from 'react-leaflet';
-//import { useMap, useMapEvent } from 'react-leaflet/hooks';
+import { TileLayer, MapContainer, Marker, Popup  } from 'react-leaflet';
+//import { useMap } from 'react-leaflet/hooks';
+import 'leaflet/dist/leaflet.css';
 import AntPath from './AntPath';
 import NewMarker from './NewMarker';
-import 'leaflet/dist/leaflet.css';
 import MapOver from './MapOver';
 import Slider from './Slider';
 import Notifica from './Notifica';
@@ -30,8 +31,8 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, set
   const markerRefs = useRef([]); // la lista di tutti gli elementi <Marker>
   const mapRef = useRef(); // riferimento alla mappa
   const inputRefs= useRef([]) // lista si tutti i tetxt <input> 
-  
-
+  const maxBounds = [[40.58125469194737,17.104468850466237],[40.57197099511666,17.12703818134258]];
+    
   console.log('------------------------------------------------') 
   console.log('oldPOI',oldPOI)
   console.log('newPOI', newPOI)
@@ -112,18 +113,35 @@ let Test = ({markers, setMarkers, setNuoviPoi, setPoiDaCancellare, notifica, set
     }
   };
   
+  const handleMapLock = (e) => { // gestisci il lock della mappa
+    if(mapRef.current.options.maxBounds === null) { // se la mappa non è bloccata
+      mapRef.current.setMaxBounds(maxBounds); // imposta i limiti
+      mapRef.current.setZoom(15) // riduci lo zoom
+      mapRef.current.setMinZoom(15) // imposta lo zoom minimo a 15
+      e.target.innerText = 'Map of Point Of Interest (locked)'; // cambia il testo del tasto
+      e.target.style.backgroundColor= 'orange'; // cambia il colore del tasto
+    }
+    else { // se la mappa è bloccata
+      mapRef.current.setMaxBounds([]); // elimina i limiti
+      mapRef.current.setMinZoom(10) // imposta lo zoom minimo a 15
+      e.target.innerText = 'Map of Point Of Interest'; // cambia il testo del tasto
+      e.target.style.backgroundColor= 'lightgreen'; // cambia il colore del tasto
+    }     
+  }
+
   return (
     <div className=' grid-cols-1 p-0 m-0'>  
-      <button style={{position: "fixed", top: 0, left: 0, 'marginTop': '10px', width: '100%', "backgroundColor": "lightgreen",
-      }}
-        onClick={handleSavePOI} disabled > 
+      <button style={{position: "fixed", top: 0, left: 0, 'margin': '5px', width: '99%', "backgroundColor": "lightgreen", border: 'solid 2px black'}}
+        onClick={(e) => handleMapLock(e)}  // gestisci il loc della mappa
+        title='Map lock/unlock'
+      > 
         Map of Point Of Interest
       </button>   
          
       <MapContainer center={[40.57567910962963, 17.11605548858643]}
-        maxBounds={[[40.58125469194737,17.104468850466237],[40.57197099511666,17.12703818134258]]}
-        minZoom={15}
-        zoom={18}     
+        maxBounds={[]}
+        minZoom={10}
+        zoom={16}     
         style={{ height: 'calc(55vh - 30px)', width: '99%', border: 'solid 1px black', position: "fixed", top: "60px", left: "0px", 
         boxShadow: '3px 3px 6px #303030', margin: '0 5px', borderRadius: '5px', boxSizing: 'border-box', overflow: 'hidden'}}
         ref={mapRef} > 
@@ -230,7 +248,7 @@ function Elenco ({ markers, onMarkerSelect, onPopupChange, setMarkers, inputRefs
 
   return (
     <div> 
-      <h2>Elenco Point Of Interest</h2>   
+      <h2 className="text-blue-600 font-bold">Elenco Point Of Interest</h2>   
       {markers.filter(items => items.type !== 'path').map((marker, index) => (  
         <div key={marker._id} className='mr-5 '>
           <input className="border-2 w-7 pr-1 text-right"  value={index+1} readOnly/>
