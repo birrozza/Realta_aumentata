@@ -77,7 +77,7 @@ function App() {
             console.log('setto changed: false');
             updatedMarkers = markers.map((marker) => 
              marker._id === oldID                           
-              ? { ...marker, changed: false} // e disabilito il tasto 'add'
+              ? { ...marker, changed: false} // e disabilito il tasto 'save'
               : marker
             ); //~ map
           } else console.log('risposta non gestita', risposta);
@@ -120,11 +120,8 @@ function App() {
   if (markers.length>0){
     return  (
       <>
-        {/*<LeafletMap  poi= {poi}/> */}  
-        {/*<SheetComponent message = ""/>*/}          
         <Test markers={markers} setMarkers={setMarkers} setNuoviPoi={setNuoviPoi} setPoiDaCancellare={setPoiDaCancellare} 
-        notifica={notifica} />
-        {/*<Elenco poi= {poi} />*/}
+              notifica={notifica} />        
       </>
     ) 
   } else console.log('In App.jsx: attesa dati')
