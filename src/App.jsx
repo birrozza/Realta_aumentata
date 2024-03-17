@@ -108,8 +108,8 @@ function App() {
     })
     .then(data => {
       console.log('in app, dati ricevuti: ',data);
-      //setPoi(data);     
-      setMarkers(data)
+      const updateData = data.map(item => ({...item, oldText: item.text}))    
+      setMarkers(updateData)
     })
     .catch(e => {
       console.log(e);
