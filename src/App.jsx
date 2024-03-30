@@ -6,8 +6,8 @@ import './App.css'
 
 function App() {
   
-  //const localURL = 'https://localhost:3000'; // per mongooseserver
-  const localURL = ''; //per renderserver
+  const localURL = 'https://localhost:3000'; // per mongooseserver
+  //const localURL = ''; //per renderserver
   const [markers, setMarkers] = useState([]); 
   const [nuoviPoi, setNuoviPoi] = useState([])
   const [poiDaCancellare, setPoiDaCancellare] = useState([])
@@ -18,7 +18,6 @@ function App() {
     console.log('in app => elemento da cancellare', poiDaCancellare)
     const idPoiDaCancellare = poiDaCancellare._id;     
         
-    //const url = `https://localhost:3000/delete?id=${idPoiDaCancellare}` // per mongooseserver
     const url = localURL + `/delete?id=${idPoiDaCancellare}` // per rendererver
     fetch(url , 
         {
